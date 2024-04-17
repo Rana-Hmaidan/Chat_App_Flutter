@@ -13,7 +13,7 @@ class EmptyWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon, size: 200),
+            Icon(icon, size: 100),
             Text(
               text,
               style: const TextStyle(fontSize: 30),

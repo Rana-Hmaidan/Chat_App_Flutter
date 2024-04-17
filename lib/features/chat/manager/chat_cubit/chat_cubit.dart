@@ -2,6 +2,7 @@ import 'package:chat_app/core/models/user_data.dart';
 //import 'package:chat_app/core/services/firestore_services.dart';
 import 'package:chat_app/core/services/user_services.dart';
 import 'package:chat_app/features/chat/services/chat_services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chat_app/features/chat/models/chat_message.dart';
 part 'chat_state.dart';
@@ -77,18 +78,29 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> getChatMessages(UserData user) async {
-    emit(ChatLoading());
+    debugPrint(user.username);
+    emit(PrivateChatLoading());
     try {
       final currentUser = await userServices.getUser();
       final selectedUser = await userServices.getSelectedUser(user.id);
 
       final messagesStream = chatServices.getChatMessages(currentUser.id, selectedUser.id);
 
-     // emit(PrivateChatLoaded(selectedUser, currentUser));
+      debugPrint(user.username);
+      debugPrint(selectedUser.username);
+      debugPrint(currentUser.username);
 
+      // messagesStream.listen((messages) {
+      //   emit(PrivateChatSuccess(messages, selectedUser , currentUser));
+      // });
+      if(await messagesStream.isEmpty){
+        emit(PrivateChatSuccess([], selectedUser , currentUser));
+      }
+      else{
       messagesStream.listen((messages) {
         emit(PrivateChatSuccess(messages, selectedUser , currentUser));
       });
+      }
       
     } catch (e) {
       emit(ChatError(e.toString()));

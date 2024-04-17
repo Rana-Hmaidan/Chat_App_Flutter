@@ -6,6 +6,8 @@ final class ChatInitial extends ChatState {}
 
 final class ChatLoading extends ChatState {}
 
+final class PrivateChatLoading extends ChatState {}
+
 final class MessageSent extends ChatState {}
 
 final class SendingMessage extends ChatState {}

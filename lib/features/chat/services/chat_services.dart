@@ -14,16 +14,17 @@ class ChatServices {
   Stream<List<ChatMessage>> getMessages() => firestoreService.collectionStream(
         path: ApiPath.messages(),
         builder: (data, documentId) => ChatMessage.fromMap(data),
+        sort:(lhs, rhs) => lhs.time.hour ,
       );
 
   Future<void> sendChatMessage(ChatMessage message, String uId , String selectedId) async {
       await firestoreService.setData(
-        path: ApiPath.sendChatMessage(uId , selectedId),
+        path: ApiPath.sendChatMessage(uId , selectedId, message.id),
         data: message.toMap(),
       );
       
       await firestoreService.setData(
-        path: ApiPath.sendChatMessage(selectedId , uId),
+        path: ApiPath.sendChatMessage(selectedId , uId, message.id),
         data: message.toMap(),
       );
   }
@@ -32,6 +33,7 @@ class ChatServices {
       firestoreService.collectionStream(
         path: ApiPath.getChatMessages(uId, selectedId),
         builder: (data, documentId) => ChatMessage.fromMap(data),
+        sort:(lhs, rhs) => lhs.time.hour ,
       );
 
 }

@@ -26,14 +26,20 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
               _messageController.clear();
             }
           },
-          buildWhen: (previous, current) => current is PrivateChatSuccess,
+          buildWhen: (previous, current) => current is PrivateChatLoading || current is PrivateChatSuccess,
           builder: (context, state) {
-           
-            if (state is PrivateChatSuccess) {
+
+            if(state is PrivateChatLoading){
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            } else if (state is PrivateChatSuccess) {
 
               final messages = state.messages;
               final selectedUser = state.selectedUser;
               final currentUser = state.currentUser;
+
+              debugPrint(selectedUser.username);
 
           return SafeArea(
             child: Scaffold(
@@ -89,7 +95,6 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Container(
-                                            width: 50,
                                             decoration: BoxDecoration(
                                               borderRadius: const BorderRadius.only(
                                                 topRight: Radius.circular(30),
@@ -110,22 +115,19 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                                               ),
                                             )
                                           ),
-                                          const SizedBox(height: 8,),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16.0 ,vertical: 8.0),
-                                            child: Text(
-                                            message.senderName,
+                                          const SizedBox(height: 4.0),
+                                          Text(
+                                             message.time.toIso8601String(),
                                               style: Theme.of(context).textTheme.labelMedium!.copyWith(
                                                 color: Colors.grey,
                                               ),
-                                            ),
-                                          ),
+                                          ), 
                                         ],
                                       ),
                                       title: Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                         child: Text(
-                                          message.senderName,
+                                          'You',
                                           style: Theme.of(context).textTheme.labelMedium!.copyWith(
                                             color: Colors.grey,
                                           ),
@@ -138,27 +140,37 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                                       backgroundImage: NetworkImage(message.recieverPhoto),
                                       radius: 25,
                                     ),
-                                    subtitle: Container(
-                                        width: 50,
-                                        decoration: BoxDecoration(
-                                          borderRadius:const BorderRadius.only(
-                                            topRight: Radius.circular(30),
-                                            bottomRight: Radius.circular(30),
-                                            topLeft: Radius.circular(30),
-                                          ),
-                                          color: Colors.lightBlueAccent[100],
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 16.0 ,vertical: 8.0),
-                                          child: Text(
-                                            message.message,
-                                            style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w400,
+                                    subtitle: Column(
+                                      children: [
+                                        Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:const BorderRadius.only(
+                                                topRight: Radius.circular(30),
+                                                bottomRight: Radius.circular(30),
+                                                topLeft: Radius.circular(30),
+                                              ),
+                                              color: Colors.lightBlueAccent[100],
                                             ),
-                                            textDirection: TextDirection.ltr,
-                                          ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 16.0 ,vertical: 8.0),
+                                              child: Text(
+                                                message.message,
+                                                style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                                textDirection: TextDirection.ltr,
+                                              ),
+                                            ),
                                         ),
+                                        const SizedBox(height: 4.0),
+                                        Text(
+                                            message.time.toIso8601String(),
+                                              style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                                                color: Colors.grey,
+                                              ),
+                                        ),
+                                      ],
                                     ),
                                     title: Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -185,7 +197,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                     hintText: 'Type a message',
                     suffixIcon: IconButton(
                       onPressed: () async =>
-                          await cubit.sendMessage(_messageController.text),
+                          await cubit.sendChatMessage(_messageController.text, selectedUser),
                       icon: const Icon(Icons.send),
                     ),
                   ),
